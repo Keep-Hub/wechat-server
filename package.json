@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.11.9",
+    "nodemailer": "^6.6.1",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "body-parser": "^1.19.0"
+  }
+}
