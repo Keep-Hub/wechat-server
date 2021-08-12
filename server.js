@@ -1,8 +1,10 @@
 const express = require('express');
 const app = express();
+const path = require('path')
 const port = 8668;
 
 var bodyParser = require('body-parser')
+
 // 配置 body-parser 中间件（插件，专门用来解析表单 POST 请求体）
 // parse application/json
 app.use(bodyParser.json())
@@ -16,7 +18,7 @@ app.all('*', (req, res, next) => {
     res.header("Access-Control-Allow-Credentials", true);
     res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
     res.header("X-Powered-By",' 3.2.1')
-    res.header("Content-Type", "application/json;charset=utf-8");
+    // res.header("Content-Type", "application/json;charset=utf-8");
     if (req.method === 'OPTIONS') {
         res.sendStatus(200)
     } else {
@@ -26,19 +28,26 @@ app.all('*', (req, res, next) => {
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!已启动`))
 const io = require('socket.io')(server)
 
-connections = []
-var joinUser = [];
+let connections = []
+let joinUser = [];
 io.on('connection', (socket) => {
     socket.on('setRoom', function (data) {
-        joinUser[data._id] = socket.id
-        console.log(joinUser);
-    });
+        joinUser[data.openid] = socket.id
+        delete joinUser[undefined]
+        console.log(joinUser)
+    })
+    socket.on('leaveRoom', function (data) {
+        delete joinUser[data.openid]
+        delete joinUser[undefined]
+        console.log(joinUser)
+    })
     socket.on('massage', data => {
-        // if(joinUser[data.sendId]) {
-        //     io.sockets.connected[joinUser[data.sendId]].emit('getMassage', data)
-        // }
         // socket.broadcast.emit('getMassage', data)
+        data.hot = 1
         socket.to(joinUser[data.sendId]).emit('getMassage', data)
+    })
+    socket.on('addNewFriend', data => {
+        socket.to(joinUser[data.friendId]).emit('getAddNewFriend', data)
     })
 	connections.push(socket)
 	socket.on('disconnect', function (data) {
@@ -47,6 +56,9 @@ io.on('connection', (socket) => {
 	})
 });
 app.get('/', (req, res) => res.send('你好!'));
+// app.use('/filePath', express.static("filePath"))
+app.use('/filePath',express.static(path.join(__dirname, 'filePath')))
+app.use('/imagePath',express.static(path.join(__dirname, 'imagePath')))
 
 require('./router/index')(app);
 //404页面

@@ -1,7 +1,7 @@
 // 引用nodemailer 发送邮件
 const nodemailer = require("nodemailer");
 const credentials = require("../config/credentials");
-let dbtable = require('../functions/dbTable').Test
+let dbtable = require('../functions/dbTable').Operate
 
 //
 let transporter = nodemailer.createTransport({
