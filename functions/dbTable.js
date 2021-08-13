@@ -222,10 +222,18 @@ function sendFriendApply (res, data) {
                 result: []
             }
             if (val.length > 0) {
-                result.code = 2001
-                result.message = '已经是好友了！'
-                res.send(result)
+                Relation.findByIdAndUpdate(val[0]._id, {isFriend: data.isFriend}, function (err, val) {
+                    if (err) {
+                        result.message = '添加好友失败' + err
+                        res.send(result)
+                    } else {
+                        result.message = '添加好友成功！'
+                        res.send(result)
+                    }
+                })
             } else {
+                data.createTime = new Date()
+                data.updateTime = new Date()
                 Relation.create(data, function (err, val) {
                     if (err) {
                         result.message = '好友申请失败！'
@@ -269,7 +277,6 @@ function queryUserDetail (res,data) {
                 result.result = doc[0].userInformation[0]
                 res.send(result)
             } else {
-                console.log(666)
                 User.find({openid: data.friendId}, function (err, val) {
                     if (err) {
                         val.send('注册失败！' + err)

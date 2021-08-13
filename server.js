@@ -49,6 +49,10 @@ io.on('connection', (socket) => {
     socket.on('addNewFriend', data => {
         socket.to(joinUser[data.friendId]).emit('getAddNewFriend', data)
     })
+    socket.on('newFriendApply', data => {
+        console.log(data)
+        socket.to(joinUser[data.friendId]).emit('getNewFriendApply', data)
+    })
 	connections.push(socket)
 	socket.on('disconnect', function (data) {
 		connections.splice(connections.indexOf(socket), 1)
